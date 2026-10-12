@@ -4,8 +4,8 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>GridBubbleHider</AssemblyName>
     <RootNamespace>GridBubbleHider</RootNamespace>
-    <!-- Папка установки Revit (для Revit 2023/2024; для 2025+ нужен net8.0-windows) -->
-    <RevitDir Condition="'$(RevitDir)'==''">C:\Program Files\Autodesk\Revit 2023</RevitDir>
+    <!-- Папка установки Revit (Revit 2022-2024; для 2025+ нужен net8.0-windows) -->
+    <RevitDir Condition="'$(RevitDir)'==''">C:\Program Files\Autodesk\Revit 2022</RevitDir>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="RevitAPI">

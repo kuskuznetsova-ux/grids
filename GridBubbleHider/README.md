@@ -7,9 +7,10 @@
 - Либо запустите без выделения и кликайте оси; обрабатывается конец, ближе к которому кликнули. `Esc` - выход.
 
 ## Сборка и установка
+Подходит для Revit 2022, 2023, 2024 (.NET Framework 4.8, один и тот же код). Укажите папку нужной версии:
 ```
-dotnet build -c Release -p:RevitDir="C:\Program Files\Autodesk\Revit 2023"
+dotnet build -c Release -p:RevitDir="C:\Program Files\Autodesk\Revit 2022"
 ```
 Скопируйте `GridBubbleHider.dll` и `GridBubbleHider.addin` в
-`%AppData%\Autodesk\Revit\Addins\2023\` (в `.addin` при необходимости укажите полный путь к dll).
+`%AppData%\Autodesk\Revit\Addins\2022\` (для другой версии - в папку с её годом; в `.addin` при необходимости укажите полный путь к dll).
 Для Revit 2025+ смените `TargetFramework` на `net8.0-windows`.
