@@ -93,18 +93,11 @@ namespace GridBubbleHider
         }
 
         /// <summary>
-        /// Какой конец оси обрабатывать. Если ровно один конец на виде 3D - берём его
-        /// (именно его и хотят перевести в 2D). Иначе - ближайший к клику, причём
-        /// положение конца берётся из кривой, как она отображается на этом виде
-        /// (у 2D-конца оно отличается от модельного).
+        /// Конец оси, ближайший к клику. Положение конца берётся из кривой, как она
+        /// отображается на этом виде (у 2D-конца оно отличается от модельного).
         /// </summary>
         private static DatumEnds PickEnd(Grid g, XYZ p, View view)
         {
-            bool m0 = g.GetDatumExtentTypeInView(DatumEnds.End0, view) == DatumExtentType.Model;
-            bool m1 = g.GetDatumExtentTypeInView(DatumEnds.End1, view) == DatumExtentType.Model;
-            if (m0 && !m1) return DatumEnds.End0;
-            if (m1 && !m0) return DatumEnds.End1;
-
             double d0 = PlanDistance(EndPointInView(g, DatumEnds.End0, view), p);
             double d1 = PlanDistance(EndPointInView(g, DatumEnds.End1, view), p);
             return d0 <= d1 ? DatumEnds.End0 : DatumEnds.End1;
