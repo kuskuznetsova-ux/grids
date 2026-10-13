@@ -9,8 +9,9 @@ namespace GridBubbleHider
     /// <summary>
     /// Для выбранной оси: переключает конец с 3D на 2D (на текущем виде)
     /// и скрывает кружок (снимает галочку "Показать номер").
-    /// Если оси выбраны заранее - обрабатываются все видимые 3D-концы.
-    /// Иначе - выбор осей по одной, обрабатывается конец, ближайший к точке клика.
+    /// Если оси выбраны заранее - сначала обрабатываются все их 3D-концы.
+    /// Затем режим выбора: кликайте оси по одной, обрабатывается конец,
+    /// ближайший к точке клика. Esc - завершить.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class HideGridBubbleCommand : IExternalCommand
@@ -52,30 +53,30 @@ namespace GridBubbleHider
                                     Process(g, end, view);
                         t.Commit();
                     }
+                    uidoc.Selection.SetElementIds(new List<ElementId>());
                 }
-                else
-                {
-                    while (true)
-                    {
-                        Reference r;
-                        try
-                        {
-                            r = uidoc.Selection.PickObject(ObjectType.Element, new GridFilter(),
-                                "Выберите ось (Esc - завершить)");
-                        }
-                        catch (Autodesk.Revit.Exceptions.OperationCanceledException)
-                        {
-                            break;
-                        }
 
-                        var g = (Grid)doc.GetElement(r);
-                        DatumEnds end = NearestEnd(g, r.GlobalPoint);
-                        using (var t = new Transaction(doc, "Скрыть кружок оси"))
-                        {
-                            t.Start();
-                            Process(g, end, view);
-                            t.Commit();
-                        }
+                // дальше - выбор осей по одной до Esc
+                while (true)
+                {
+                    Reference r;
+                    try
+                    {
+                        r = uidoc.Selection.PickObject(ObjectType.Element, new GridFilter(),
+                            "Кликайте по осям (Esc - завершить)");
+                    }
+                    catch (Autodesk.Revit.Exceptions.OperationCanceledException)
+                    {
+                        break;
+                    }
+
+                    var g = (Grid)doc.GetElement(r);
+                    DatumEnds end = NearestEnd(g, r.GlobalPoint);
+                    using (var t = new Transaction(doc, "Скрыть кружок оси"))
+                    {
+                        t.Start();
+                        Process(g, end, view);
+                        t.Commit();
                     }
                 }
 

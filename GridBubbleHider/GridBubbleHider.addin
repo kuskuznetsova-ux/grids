@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
-  <AddIn Type="Command">
-    <Name>Grid 3D to 2D, hide bubble</Name>
+  <AddIn Type="Application">
+    <Name>Grid bubble hider</Name>
     <Assembly>GridBubbleHider.dll</Assembly>
-    <FullClassName>GridBubbleHider.HideGridBubbleCommand</FullClassName>
-    <ClientId>6f1d0c52-3b8e-4c0a-9a57-2f7a1e5b9d11</ClientId>
+    <FullClassName>GridBubbleHider.App</FullClassName>
+    <ClientId>6f1d0c52-3b8e-4c0a-9a57-2f7a1e5b9d12</ClientId>
     <VendorId>GRIDS</VendorId>
     <VendorDescription>Grid tools</VendorDescription>
   </AddIn>
