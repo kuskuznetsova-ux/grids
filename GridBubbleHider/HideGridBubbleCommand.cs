@@ -10,8 +10,8 @@ namespace GridBubbleHider
     /// Для выбранной оси: переключает конец с 3D на 2D (на текущем виде)
     /// и скрывает кружок (снимает галочку "Показать номер").
     /// Если оси выбраны заранее - сначала обрабатываются все их 3D-концы.
-    /// Затем режим выбора: кликайте оси по одной, обрабатывается конец,
-    /// ближайший к точке клика. Esc - завершить.
+    /// Затем режим выбора: кликайте оси по одной: у ближайшего к клику конца кружок
+    /// скрывается, а если его уже нет - возвращается (конец остаётся 2D). Esc - завершить.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class HideGridBubbleCommand : IExternalCommand
@@ -75,7 +75,7 @@ namespace GridBubbleHider
                     using (var t = new Transaction(doc, "Скрыть кружок оси"))
                     {
                         t.Start();
-                        Process(g, end, view);
+                        Toggle(g, end, view);
                         t.Commit();
                     }
                 }
@@ -83,6 +83,17 @@ namespace GridBubbleHider
                 tg.Assimilate();
             }
             return Result.Succeeded;
+        }
+
+        // клик: кружок есть - скрыть (с переводом в 2D); кружка нет - вернуть, оставив 2D
+        private static void Toggle(Grid g, DatumEnds end, View view)
+        {
+            if (g.GetDatumExtentTypeInView(end, view) != DatumExtentType.ViewSpecific)
+                g.SetDatumExtentType(end, view, DatumExtentType.ViewSpecific);
+            if (g.IsBubbleVisibleInView(end, view))
+                g.HideBubbleInView(end, view);
+            else
+                g.ShowBubbleInView(end, view);
         }
 
         private static void Process(Grid g, DatumEnds end, View view)
