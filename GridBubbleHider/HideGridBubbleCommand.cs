@@ -71,7 +71,7 @@ namespace GridBubbleHider
                     }
 
                     var g = (Grid)doc.GetElement(r);
-                    DatumEnds end = NearestEnd(g, r.GlobalPoint);
+                    DatumEnds end = PickEnd(g, r.GlobalPoint, view);
                     using (var t = new Transaction(doc, "Скрыть кружок оси"))
                     {
                         t.Start();
@@ -92,14 +92,34 @@ namespace GridBubbleHider
             g.HideBubbleInView(end, view);
         }
 
-        private static DatumEnds NearestEnd(Grid g, XYZ p)
+        /// <summary>
+        /// Какой конец оси обрабатывать. Если ровно один конец на виде 3D - берём его
+        /// (именно его и хотят перевести в 2D). Иначе - ближайший к клику, причём
+        /// положение конца берётся из кривой, как она отображается на этом виде
+        /// (у 2D-конца оно отличается от модельного).
+        /// </summary>
+        private static DatumEnds PickEnd(Grid g, XYZ p, View view)
         {
-            Curve c = g.Curve;
-            XYZ p0 = c.GetEndPoint(0), p1 = c.GetEndPoint(1);
-            // сравнение в плане (по XY), т.к. точка клика может иметь другую Z
-            double d0 = new XYZ(p0.X - p.X, p0.Y - p.Y, 0).GetLength();
-            double d1 = new XYZ(p1.X - p.X, p1.Y - p.Y, 0).GetLength();
+            bool m0 = g.GetDatumExtentTypeInView(DatumEnds.End0, view) == DatumExtentType.Model;
+            bool m1 = g.GetDatumExtentTypeInView(DatumEnds.End1, view) == DatumExtentType.Model;
+            if (m0 && !m1) return DatumEnds.End0;
+            if (m1 && !m0) return DatumEnds.End1;
+
+            double d0 = PlanDistance(EndPointInView(g, DatumEnds.End0, view), p);
+            double d1 = PlanDistance(EndPointInView(g, DatumEnds.End1, view), p);
             return d0 <= d1 ? DatumEnds.End0 : DatumEnds.End1;
         }
+
+        private static XYZ EndPointInView(Grid g, DatumEnds end, View view)
+        {
+            DatumExtentType type = g.GetDatumExtentTypeInView(end, view);
+            IList<Curve> curves = g.GetCurvesInView(type, view);
+            Curve c = curves != null && curves.Count > 0 ? curves[0] : g.Curve;
+            return c.GetEndPoint(end == DatumEnds.End0 ? 0 : 1);
+        }
+
+        // сравнение в плане (по XY), т.к. точка клика может иметь другую Z
+        private static double PlanDistance(XYZ a, XYZ b) =>
+            new XYZ(a.X - b.X, a.Y - b.Y, 0).GetLength();
     }
 }
